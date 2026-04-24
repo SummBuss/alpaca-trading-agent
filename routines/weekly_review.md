@@ -1,6 +1,6 @@
 # Routine: Weekly Review & Strategy Assessment
-<!-- CRON: 30 22 * * 5 -->
-<!-- Runs: 22:30 Amsterdam time (CET/CEST), every Friday -->
+<!-- CRON: 30 20 * * 5 (UTC) -->
+<!-- Runs: 20:30 UTC = 22:30 Amsterdam (CEST) / 21:30 Amsterdam (CET), every Friday -->
 <!-- Purpose: Grade week's performance, benchmark vs. SPY, suggest strategy updates, send ClickUp report. -->
 
 ---

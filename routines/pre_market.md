@@ -1,6 +1,6 @@
 # Routine: Pre-Market Research
-<!-- CRON: 0 14 * * 1-5 -->
-<!-- Runs: 14:00 Amsterdam time (CET/CEST), Monday–Friday -->
+<!-- CRON: 0 12 * * 1-5 (UTC) -->
+<!-- Runs: 12:00 UTC = 14:00 Amsterdam (CEST) / 13:00 Amsterdam (CET), Monday–Friday -->
 <!-- Purpose: Research catalysts, build Action Plan. NO trades. NO ClickUp unless API failure. -->
 
 ---

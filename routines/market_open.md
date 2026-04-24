@@ -1,6 +1,6 @@
 # Routine: Market Open — Execute Trades
-<!-- CRON: 45 15 * * 1-5 -->
-<!-- Runs: 15:45 Amsterdam time (CET/CEST), Monday–Friday -->
+<!-- CRON: 45 13 * * 1-5 (UTC) -->
+<!-- Runs: 13:45 UTC = 15:45 Amsterdam (CEST) / 14:45 Amsterdam (CET), Monday–Friday -->
 <!-- Purpose: Query live portfolio, execute Action Plan from research.md, set stops, log trades. -->
 
 ---

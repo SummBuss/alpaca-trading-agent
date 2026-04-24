@@ -1,6 +1,6 @@
 # Routine: Market Close — End of Day Review & Archiving
-<!-- CRON: 15 22 * * 1-5 -->
-<!-- Runs: 22:15 Amsterdam time (CET/CEST), Monday–Friday -->
+<!-- CRON: 15 20 * * 1-5 (UTC) -->
+<!-- Runs: 20:15 UTC = 22:15 Amsterdam (CEST) / 21:15 Amsterdam (CET), Monday–Friday -->
 <!-- Purpose: Review day, archive old trades, write EOD summary, commit all memory. -->
 
 ---

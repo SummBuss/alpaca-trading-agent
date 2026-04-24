@@ -1,6 +1,6 @@
 # Routine: Midday Position Management
-<!-- CRON: 0 19 * * 1-5 -->
-<!-- Runs: 19:00 Amsterdam time (CET/CEST), Monday–Friday -->
+<!-- CRON: 0 17 * * 1-5 (UTC) -->
+<!-- Runs: 17:00 UTC = 19:00 Amsterdam (CEST) / 18:00 Amsterdam (CET), Monday–Friday -->
 <!-- Purpose: Cut losers at -7%, tighten stops on winners, update trade_log.md. -->
 
 ---
