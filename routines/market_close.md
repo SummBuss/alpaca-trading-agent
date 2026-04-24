@@ -23,20 +23,23 @@ Pull the day's final state from Alpaca:
 **Account:**
 ```
 GET https://paper-api.alpaca.markets/v2/account
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 Record: `portfolio_value`, `equity`, `last_equity`, `buying_power`
 
 **Open positions (what survived the day):**
 ```
 GET https://paper-api.alpaca.markets/v2/positions
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 
 **Today's filled orders (what was executed today):**
 ```
 GET https://paper-api.alpaca.markets/v2/orders?status=closed&after=[TODAY_ISO]&limit=50
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 
 Record all filled orders: symbol, side, filled_qty, filled_avg_price, filled_at.
@@ -106,7 +109,7 @@ git add memory/trade_log.md memory/archive_log.md && git commit -m "market_close
 
 Log: `[market_close] Complete. Portfolio: $[VALUE]. Open positions: [N]. Archived: [N] trades.`
 
-Do NOT send ClickUp unless a Graceful Failure is triggered. (Weekly ClickUp summary happens in weekly_review.)
+Do NOT send Telegram unless a Graceful Failure is triggered. (Weekly Telegram summary happens in weekly_review.)
 
 ---
 
@@ -123,12 +126,14 @@ Do NOT send ClickUp unless a Graceful Failure is triggered. (Weekly ClickUp summ
    Time: [timestamp]
    Impact: trade_log.md and archive_log.md may be out of sync with actual account state.
    ```
-3. **Send URGENT ClickUp message** (priority 1):
+3. **Send URGENT Telegram message**:
    ```
-   URGENT: Trading Agent — market_close routine FAILED
-   Details: [error], [timestamp]
-   Impact: End-of-day reconciliation did not complete. trade_log.md may be stale.
-   Action required: Manually verify positions in Alpaca and check archive_log.md for integrity.
+   POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
+   Body: {
+     "chat_id": $TELEGRAM_CHAT_ID,
+     "parse_mode": "Markdown",
+     "text": "🚨 *URGENT: market_close FAILED*\nError: [details]\nTime: [timestamp]\nImpact: EOD reconciliation did not complete. trade_log.md may be stale.\nAction: manually verify positions in Alpaca and check archive_log.md."
+   }
    ```
 4. **Exit cleanly.** Do not write partial updates to memory files.
 

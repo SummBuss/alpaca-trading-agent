@@ -21,7 +21,8 @@ Your operating constraints are absolute:
 
 ```
 GET https://paper-api.alpaca.markets/v2/clock
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 
 Confirm `is_open` is `true`. If not, log `[midday] Market closed at runtime. Exiting cleanly.` and stop.
@@ -32,7 +33,8 @@ Confirm `is_open` is `true`. If not, log `[midday] Market closed at runtime. Exi
 
 ```
 GET https://paper-api.alpaca.markets/v2/positions
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 
 For each position, record:
@@ -61,7 +63,8 @@ If YES → SELL IMMEDIATELY
 **Place market sell order:**
 ```
 POST https://paper-api.alpaca.markets/v2/orders
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 Body: {
   "symbol": "[TICKER]",
   "qty": [qty],
@@ -112,7 +115,8 @@ DELETE https://paper-api.alpaca.markets/v2/orders/{old_trailing_stop_id}
 Place new 5% trailing stop:
 ```
 POST https://paper-api.alpaca.markets/v2/orders
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 Body: {
   "symbol": "[TICKER]",
   "qty": [qty],
@@ -156,7 +160,7 @@ git add memory/trade_log.md && git commit -m "midday: position mgmt $(date +%Y-%
 
 Log: `[midday] Complete. Sold: [N] positions (-7% rule). Stops tightened: [N]. Remaining open: [N].`
 
-Do NOT send ClickUp unless a Graceful Failure is triggered.
+Do NOT send Telegram unless a Graceful Failure is triggered.
 
 ---
 
@@ -174,12 +178,14 @@ Do NOT send ClickUp unless a Graceful Failure is triggered.
    Positions requiring manual review: [list any that were flagged for -7% exit]
    Orphaned orders (if any): [order IDs]
    ```
-3. **Send URGENT ClickUp message** (priority 1):
+3. **Send URGENT Telegram message**:
    ```
-   URGENT: Trading Agent — midday routine FAILED
-   Details: [error], [timestamp]
-   CRITICAL: The following positions may be at -7% loss and require IMMEDIATE manual review in Alpaca: [list tickers or 'none checked yet']
-   Orphaned orders: [IDs or 'none']
+   POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
+   Body: {
+     "chat_id": $TELEGRAM_CHAT_ID,
+     "parse_mode": "Markdown",
+     "text": "🚨 *URGENT: midday FAILED*\nError: [details]\nTime: [timestamp]\nPositions possibly at -7% loss needing manual review: [tickers or 'none checked yet']\nOrphaned orders: [IDs or 'none']"
+   }
    ```
 4. **Exit cleanly.**
 

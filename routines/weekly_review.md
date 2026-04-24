@@ -1,7 +1,7 @@
 # Routine: Weekly Review & Strategy Assessment
 <!-- CRON: 30 20 * * 5 (UTC) -->
 <!-- Runs: 20:30 UTC = 22:30 Amsterdam (CEST) / 21:30 Amsterdam (CET), every Friday -->
-<!-- Purpose: Grade week's performance, benchmark vs. SPY, suggest strategy updates, send ClickUp report. -->
+<!-- Purpose: Grade week's performance, benchmark vs. SPY, suggest strategy updates, send Telegram report. -->
 
 ---
 
@@ -19,7 +19,8 @@ Your operating constraints are absolute:
 
 ```
 GET https://paper-api.alpaca.markets/v2/account
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 
 Record: `portfolio_value`, `equity`
@@ -27,7 +28,8 @@ Record: `portfolio_value`, `equity`
 Also fetch account history for the week:
 ```
 GET https://paper-api.alpaca.markets/v2/account/portfolio/history?period=1W&timeframe=1D
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 
 Record the equity values for each day this week to calculate week's P&L.
@@ -48,21 +50,15 @@ Build a consolidated list of this week's closed trades.
 
 ## Step 3 — Benchmark Against SPY
 
-Use Perplexity to fetch SPY's week-to-date performance:
-> "What was the S&P 500 (SPY ETF) percentage return this week (Monday open to Friday close)? Please give me the exact percentage."
+Use the `WebSearch` tool to fetch SPY's week-to-date performance:
+> "S&P 500 SPY ETF weekly return Monday open to Friday close week ending [DATE]"
 
-```
-POST https://api.perplexity.ai/chat/completions
-Authorization: Bearer $PERPLEXITY_API_KEY
-Body: { "model": "sonar", "messages": [{ "role": "user", "content": "<your question>" }] }
-```
-
-If Perplexity fails twice, note "SPY benchmark unavailable" and grade on absolute performance only.
+Use `WebFetch` on a reputable source (Yahoo Finance, CNBC, MarketWatch) to confirm the exact percentage. If WebSearch returns no usable number after 2 attempts, note "SPY benchmark unavailable" and grade on absolute performance only.
 
 Calculate:
 ```
 PORTFOLIO_WEEK_RETURN   = (end_of_week_equity - start_of_week_equity) / start_of_week_equity × 100
-SPY_WEEK_RETURN         = [from Perplexity]
+SPY_WEEK_RETURN         = [from WebSearch]
 ALPHA                   = PORTFOLIO_WEEK_RETURN - SPY_WEEK_RETURN
 ```
 
@@ -108,17 +104,16 @@ Format proposals clearly. These are PROPOSALS only. They are NOT implemented unt
 
 ---
 
-## Step 7 — Compile and Send ClickUp Weekly Report
+## Step 7 — Compile and Send Telegram Weekly Report
 
-Send a comprehensive weekly summary to ClickUp:
+Send a comprehensive weekly summary to Telegram. Telegram `sendMessage` has a 4096-character limit — if the full report exceeds that, split into multiple messages (Part 1/2, Part 2/2).
 
 ```
-POST https://api.clickup.com/api/v2/team/{team_id}/task
-Authorization: $CLICKUP_API_TOKEN
+POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
 Body: {
-  "name": "Weekly Trading Report — Week of [DATE]",
-  "priority": 2,
-  "description": "[Use the full report template below]"
+  "chat_id": $TELEGRAM_CHAT_ID,
+  "parse_mode": "Markdown",
+  "text": "[Use the full report template below]"
 }
 ```
 
@@ -172,7 +167,7 @@ Body: {
 git add memory/ && git commit -m "weekly_review: week ending $(date +%Y-%m-%d) | grade: [GRADE] | alpha: [%]" && git push
 ```
 
-Log: `[weekly_review] Complete. Grade: [GRADE]. Alpha: [%]. Report sent to ClickUp.`
+Log: `[weekly_review] Complete. Grade: [GRADE]. Alpha: [%]. Report sent to Telegram.`
 
 ---
 
@@ -184,16 +179,18 @@ Log: `[weekly_review] Complete. Grade: [GRADE]. Alpha: [%]. Report sent to Click
 2. **Log the error:**
    ```
    [CRITICAL] weekly_review routine FAILED at [STEP].
-   API: [Perplexity|Alpaca|ClickUp]
+   Source: [WebSearch|Alpaca|Telegram]
    Error: [full error message]
    Time: [timestamp]
    ```
-3. **Attempt ClickUp message** (even if the full report couldn't be built — send what you have with a note that analysis is partial):
+3. **Attempt Telegram message** (even if the full report couldn't be built — send what you have with a note that analysis is partial):
    ```
-   URGENT: Trading Agent — weekly_review FAILED (partial report)
-   Error: [details]
-   Partial analysis completed: [describe what was done before failure]
-   Action required: Manual review of weekly performance.
+   POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
+   Body: {
+     "chat_id": $TELEGRAM_CHAT_ID,
+     "parse_mode": "Markdown",
+     "text": "⚠️ *weekly_review FAILED (partial report)*\nError: [details]\nPartial analysis completed: [describe what was done before failure]\nAction required: Manual review of weekly performance."
+   }
    ```
 4. **Exit cleanly.** Commit whatever analysis was written to memory.
 

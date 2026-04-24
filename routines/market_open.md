@@ -21,7 +21,8 @@ Your operating constraints are absolute:
 
 ```
 GET https://paper-api.alpaca.markets/v2/clock
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 
 Check that `is_open` is `true`. If the market is not open, log `[market_open] Market is not open at runtime. Exiting cleanly.` and stop.
@@ -35,7 +36,8 @@ Make the following Alpaca API calls. These numbers override EVERYTHING in memory
 **Account balances:**
 ```
 GET https://paper-api.alpaca.markets/v2/account
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 Record these values from the response:
 - `portfolio_value` → PORTFOLIO_VALUE
@@ -45,7 +47,8 @@ Record these values from the response:
 **Open positions:**
 ```
 GET https://paper-api.alpaca.markets/v2/positions
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 ```
 Record: ticker, qty, avg_entry_price, current_price, unrealized_pl, unrealized_plpc for each position.
 
@@ -61,7 +64,7 @@ Open `memory/research.md`. Check:
 - [ ] "Research Date" equals today's date (YYYY-MM-DD). If NOT, log a warning and STOP — do not trade on stale research.
 - [ ] The Action Plan table is populated and at least one row is marked BUY (not SKIP).
 
-If the file is stale or the Action Plan is empty, log the issue and exit cleanly. Do not send ClickUp message for this (it is not an API failure).
+If the file is stale or the Action Plan is empty, log the issue and exit cleanly. Do not send Telegram message for this (it is not an API failure).
 
 ---
 
@@ -92,7 +95,8 @@ For each ticker that passed Step 4:
 **Place market buy order:**
 ```
 POST https://paper-api.alpaca.markets/v2/orders
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 Body: {
   "symbol": "[TICKER]",
   "qty": [SHARES_TO_BUY],
@@ -109,7 +113,8 @@ Record: `filled_avg_price` → FILL_PRICE
 **Immediately set 10% trailing stop:**
 ```
 POST https://paper-api.alpaca.markets/v2/orders
-Authorization: Bearer $ALPACA_API_KEY
+APCA-API-KEY-ID: $ALPACA_API_KEY_ID
+APCA-API-SECRET-KEY: $ALPACA_API_SECRET_KEY
 Body: {
   "symbol": "[TICKER]",
   "qty": [SHARES_TO_BUY],
@@ -146,20 +151,19 @@ Also update "Alpaca Account Balance at last sync" and timestamp.
 
 ---
 
-## Step 7 — ClickUp Notification (ONLY if a trade was placed)
+## Step 7 — Telegram Notification (ONLY if a trade was placed)
 
-If at least one order was filled, send a ClickUp message:
+If at least one order was filled, send a Telegram message:
 ```
-POST https://api.clickup.com/api/v2/team/{team_id}/task
-Authorization: $CLICKUP_API_TOKEN
+POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
 Body: {
-  "name": "Trade Executed — [DATE]",
-  "description": "Positions opened today:\n[list each: TICKER, shares @ fill price, trailing stop set at 10%]\n\nPortfolio value: $[PORTFOLIO_VALUE]\nBuying power remaining: $[BUYING_POWER after orders]",
-  "priority": 3
+  "chat_id": $TELEGRAM_CHAT_ID,
+  "parse_mode": "Markdown",
+  "text": "✅ *Trade Executed — [DATE]*\nPositions opened:\n[list each: TICKER, shares @ fill price, trailing stop set at 10%]\n\nPortfolio value: $[PORTFOLIO_VALUE]\nBuying power remaining: $[BUYING_POWER]"
 }
 ```
 
-If NO trades were placed (all tickers skipped), do NOT send ClickUp.
+If NO trades were placed (all tickers skipped), do NOT send Telegram.
 
 ---
 
@@ -187,12 +191,14 @@ Log: `[market_open] Complete. [N] positions opened. [N] skipped. Portfolio: $[VA
    Orphaned orders (if any): [order IDs]
    Action: Routine halted. Manual review required.
    ```
-3. **Send URGENT ClickUp message** (priority 1):
+3. **Send URGENT Telegram message**:
    ```
-   URGENT: Trading Agent — market_open FAILED
-   Details: [error], [timestamp]
-   Orphaned orders needing manual review: [IDs or 'none']
-   Immediate action: Log into Alpaca paper account and verify all open orders/positions.
+   POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage
+   Body: {
+     "chat_id": $TELEGRAM_CHAT_ID,
+     "parse_mode": "Markdown",
+     "text": "🚨 *URGENT: market_open FAILED*\nError: [details]\nTime: [timestamp]\nOrphaned orders: [IDs or 'none']\nAction: log into Alpaca paper account and verify all open orders/positions."
+   }
    ```
 4. **Exit cleanly.** Do not partially update trade_log.md.
 
