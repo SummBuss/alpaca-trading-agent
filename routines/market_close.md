@@ -99,12 +99,31 @@ Append an EOD summary block to the bottom of `memory/trade_log.md` (overwrite th
 
 ---
 
+## Step 4b — End-of-Day Reflection (Append Lessons)
+
+Based on today's activity (all positions opened, closed, or currently held), append 1–3 focused observations to `memory/lessons.md` Entry Log. Keep each ≤160 chars. Use these tags:
+- `execution` — slippage, partial fills, gap opens, unusual liquidity
+- `macro` — if SPY/VIX/sector behavior was notable
+- `thesis` — for closed trades: did the catalyst play out as expected?
+- `win` / `mistake` — only if something decisively worked or decisively didn't
+
+Example lines:
+```
+2026-04-24 | market_close | thesis | NVDA +3% on analyst upgrade as planned; volume 1.5x avg confirmed conviction.
+2026-04-24 | market_close | mistake | AMD entered at 163.50 but gapped to 165.80 — entry criteria needed a wider slippage tolerance.
+2026-04-24 | market_close | macro | VIX closed 22.4, above 20 threshold; consistent with chop in SPY.
+```
+
+If nothing notable happened (routine day, no trades closed, no unusual behavior), write ONE entry tagged `macro` summarizing the market day in one line. Never skip this step entirely — the entry log should have at least one line per trading day.
+
+---
+
 ## Step 5 — Save and Commit All Memory
 
 Commit all memory file changes in one atomic commit:
 
 ```
-git add memory/trade_log.md memory/archive_log.md && git commit -m "market_close: EOD $(date +%Y-%m-%d) | portfolio: $[VALUE]" && git push
+git add memory/trade_log.md memory/archive_log.md memory/lessons.md && git commit -m "market_close: EOD $(date +%Y-%m-%d) | portfolio: $[VALUE]" && git push
 ```
 
 Log: `[market_close] Complete. Portfolio: $[VALUE]. Open positions: [N]. Archived: [N] trades.`

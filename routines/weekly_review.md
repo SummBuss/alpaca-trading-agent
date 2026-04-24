@@ -93,6 +93,25 @@ Identify:
 
 ---
 
+## Step 5b — Synthesize Lessons & Clean Avoid List
+
+This is the **only** step in any routine authorized to autonomously rewrite parts of `memory/lessons.md` and `memory/avoid_list.md`. It is NOT authorized to edit `memory/strategy.md` — rule changes remain in Step 6 as proposals only.
+
+**A. Synthesize the week's lessons.**
+1. Read the last ~100 lines of `memory/lessons.md` Entry Log (this week plus a bit of prior context).
+2. Identify up to 5 patterns that are each backed by at least 3 entry-log observations within the last 30 days. Examples: "Earnings-adjacent entries stopped out 4 of last 5", "High-VIX days produced no winning entries", "Tightening stop at +20% preserved gains 3/3 times".
+3. Rewrite the **Synthesized Insights** section at the top of `memory/lessons.md` with these patterns. Replace any prior contents of that section; the Entry Log below remains append-only and untouched.
+4. If fewer than 3 patterns are well-supported, write what you have and note "Insufficient data for additional patterns — will revisit next Friday."
+
+**B. Prune old entry log rows.**
+- Delete Entry Log rows older than 90 days (count by date column). Note the deletion count in the console log.
+
+**C. Clean the avoid list.**
+- In `memory/avoid_list.md`, remove every row whose `Expires On` date is today or earlier.
+- If a ticker appeared in the avoid list more than twice in the last 60 days (count across lessons.md `mistake` entries), note it in Step 6 as a candidate for permanent exclusion — do NOT add it to strategy.md yourself.
+
+---
+
 ## Step 6 — Strategy Improvement Proposals
 
 Based on this week's analysis, identify up to 3 specific, actionable proposals to improve strategy.md. Each proposal must include:
@@ -164,7 +183,7 @@ Body: {
 ## Step 8 — Save and Commit
 
 ```
-git add memory/ && git commit -m "weekly_review: week ending $(date +%Y-%m-%d) | grade: [GRADE] | alpha: [%]" && git push
+git add memory/ && git commit -m "weekly_review: week ending $(date +%Y-%m-%d) | grade: [GRADE] | alpha: [%] | lessons synthesized" && git push
 ```
 
 Log: `[weekly_review] Complete. Grade: [GRADE]. Alpha: [%]. Report sent to Telegram.`

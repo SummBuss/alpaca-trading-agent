@@ -42,6 +42,19 @@ You will use this as the filter for every ticker you research today.
 
 ---
 
+## Step 2b — Load Agent Memory (Lessons + Avoid List)
+
+Before any external research, load what the agent has already learned:
+
+1. Read `memory/lessons.md` in full. Pay special attention to the **Synthesized Insights** section (top) — these are the patterns `weekly_review` has extracted. Also scan the last ~30 lines of the **Entry Log** for recent concrete observations.
+2. Read `memory/avoid_list.md`. Extract every ticker in the **Active Entries** table along with its `Expires On` date.
+
+Keep both in working memory for the rest of the routine. You will:
+- Filter out any candidate ticker that appears on the avoid list with a non-expired date (see Step 5).
+- Let the Synthesized Insights influence macro posture and candidate selection where relevant (e.g. "high-VIX weeks stop out fast → be pickier on R:R").
+
+---
+
 ## Step 3 — Market Environment Check
 
 Use the `WebSearch` tool to answer (combine into one or more queries as needed):
@@ -80,14 +93,17 @@ For each surviving candidate, define:
 
 Then write the complete Action Plan into `memory/research.md`. Overwrite the entire file using the template structure in that file. Set "Research Date" to today's date.
 
-In the "Tickers to AVOID Today" section, list any names with adverse news, earnings risk within 2 days, or broken thesis.
+In the "Tickers to AVOID Today" section, list any names with adverse news, earnings risk within 2 days, or broken thesis. **Also** list every non-expired ticker from `memory/avoid_list.md` with "(cooldown — see avoid_list.md)" as the reason. If a researched candidate collides with the avoid list, drop it here and append a single line to `memory/lessons.md` Entry Log:
+```
+YYYY-MM-DD | pre_market | mistake | Avoid-list override: [TICKER] had a fresh catalyst but cooldown active until [EXPIRES_ON].
+```
 
 ---
 
 ## Step 6 — Save and Commit
 
 After writing research.md:
-1. Stage and commit to GitHub: `git add memory/research.md && git commit -m "pre_market: research $(date +%Y-%m-%d)" && git push`
+1. Stage and commit to GitHub: `git add memory/research.md memory/lessons.md && git commit -m "pre_market: research $(date +%Y-%m-%d)" && git push`
 2. Log to console: `[pre_market] Complete. Action Plan written for [DATE]. Candidates: [TICKERS].`
 
 Do NOT send any Telegram message unless a failure occurred.

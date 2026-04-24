@@ -49,6 +49,12 @@ If no positions are open, log `[midday] No open positions. Exiting cleanly.` and
 
 ---
 
+## Step 2b — Load Agent Memory
+
+Read `memory/lessons.md` tail (~30 lines) and the **Synthesized Insights** section. Use these as context when judging "thesis broken" situations in Step 3 — e.g. if insights say "earnings-week entries stop out 4/5 times," be quicker to cut an earnings-adjacent position showing weakness.
+
+---
+
 ## Step 3 — Apply -7% Hard Stop Rule
 
 For each position where `unrealized_plpc ≤ -0.07` (i.e., -7% or worse):
@@ -140,6 +146,28 @@ If DAYS_HELD ≥ 15 for any position, flag it: log a note in trade_log.md under 
 
 ---
 
+## Step 5b — Record Lessons and Update Avoid List
+
+For each position you cut in Steps 3–5 (whether -7% stop, thesis break, or 15-day max hold), do BOTH of the following:
+
+1. **Append to `memory/lessons.md`** Entry Log — one line:
+   ```
+   YYYY-MM-DD | midday | mistake | [TICKER] cut at [P&L%] — reason: [-7% stop | thesis break | 15-day max]. Catalyst was: [original thesis, 10 words max].
+   ```
+   If a position hit +20% and you tightened its trailing stop, append instead:
+   ```
+   YYYY-MM-DD | midday | win | [TICKER] +[P&L%] — trailing stop tightened to 5%. Catalyst: [original thesis, 10 words max].
+   ```
+
+2. **Update `memory/avoid_list.md`** — for each cut position, add a row to the Active Entries table:
+   - `Expires On` = today + 5 trading days (or + 10 if this ticker was cut once already in the last 30 days — check by searching lessons.md or archive_log.md).
+   - `Reason` = one-line summary (e.g. "Cut at -7% on earnings reaction").
+   - `Source Routine` = `midday`.
+
+   Do NOT add tickers that simply had winners tightened — only cuts populate the avoid list.
+
+---
+
 ## Step 6 — Update trade_log.md
 
 For positions that were sold: move them from the "Active Positions" table to the "Closed Trades — Last 7 Days" table. Fill in all fields.
@@ -155,7 +183,7 @@ Update the timestamp and account balance at bottom of file.
 ## Step 7 — Save and Commit
 
 ```
-git add memory/trade_log.md && git commit -m "midday: position mgmt $(date +%Y-%m-%d)" && git push
+git add memory/trade_log.md memory/lessons.md memory/avoid_list.md && git commit -m "midday: position management $(date +%Y-%m-%d)" && git push
 ```
 
 Log: `[midday] Complete. Sold: [N] positions (-7% rule). Stops tightened: [N]. Remaining open: [N].`

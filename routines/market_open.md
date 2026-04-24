@@ -58,6 +58,15 @@ If OPEN_POSITION_COUNT ≥ 5, log `[market_open] Max positions (5) already held.
 
 ---
 
+## Step 2b — Load Avoid List
+
+Read `memory/avoid_list.md`. Any ticker with a non-expired `Expires On` date is a hard SKIP regardless of what the Action Plan says — pre_market should already have filtered these out, but verify again here. If the Action Plan contains a blacklisted ticker, mark it SKIP, do not place the order, and append to `memory/lessons.md`:
+```
+YYYY-MM-DD | market_open | mistake | Action Plan included [TICKER] but avoid_list cooldown is active until [EXPIRES_ON]. Skipped.
+```
+
+---
+
 ## Step 3 — Read and Validate the Action Plan
 
 Open `memory/research.md`. Check:
@@ -170,7 +179,7 @@ If NO trades were placed (all tickers skipped), do NOT send Telegram.
 ## Step 8 — Save and Commit
 
 ```
-git add memory/trade_log.md && git commit -m "market_open: trades $(date +%Y-%m-%d)" && git push
+git add memory/trade_log.md memory/lessons.md && git commit -m "market_open: trades $(date +%Y-%m-%d)" && git push
 ```
 
 Log: `[market_open] Complete. [N] positions opened. [N] skipped. Portfolio: $[VALUE].`
